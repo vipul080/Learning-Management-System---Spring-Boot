@@ -3,6 +3,7 @@ package com.lms.service;
 import com.lms.entity.Course;
 import com.lms.entity.Enrollment;
 import com.lms.entity.User;
+import com.lms.exception.AlreadyEnrolledException;
 import com.lms.repository.CourseRepository;
 import com.lms.repository.EnrollmentRepository;
 import com.lms.repository.UserRepository;
@@ -35,6 +36,12 @@ public class EnrollmentService {
 
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        if (enrollmentRepository.existsByStudentAndCourse(student, course)) {
+            throw new AlreadyEnrolledException(
+                    "Student is already enrolled in this course"
+            );
+        }
 
         Enrollment enrollment = new Enrollment();
         enrollment.setStudent(student);

@@ -1,6 +1,9 @@
 package com.lms.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,9 +14,13 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Title is required")
+    @Size(max = 100, message = "Title must not exceed 100 characters")
     @Column(nullable = false)
     private String title;
 
+    @NotBlank(message = "Description is required")
+    @Size(max = 1000, message = "Description must not exceed 1000 characters")
     @Column(nullable = false, length = 1000)
     private String description;
 
