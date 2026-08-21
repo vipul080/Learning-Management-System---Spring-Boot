@@ -2,8 +2,10 @@ package com.lms.service;
 
 import com.lms.entity.Course;
 import com.lms.entity.Enrollment;
+import com.lms.entity.EnrollmentStatus;
 import com.lms.entity.User;
 import com.lms.exception.AlreadyEnrolledException;
+import com.lms.exception.ResourceNotFoundException;
 import com.lms.repository.CourseRepository;
 import com.lms.repository.EnrollmentRepository;
 import com.lms.repository.UserRepository;
@@ -47,8 +49,13 @@ public class EnrollmentService {
         enrollment.setStudent(student);
         enrollment.setCourse(course);
         enrollment.setEnrolledAt(LocalDateTime.now());
+        //enrollment.setStatus(EnrollmentStatus.ACTIVE);
 
         return enrollmentRepository.save(enrollment);
+    }
+
+    public List<Enrollment> getAllEnrollments() {
+        return enrollmentRepository.findAll();
     }
 
     public List<Enrollment> getMyEnrollments(String email) {
@@ -57,5 +64,19 @@ public class EnrollmentService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return enrollmentRepository.findByStudent(student);
+    }
+
+    public void cancelEnrollment(Long enrollmentId, String email) {
+
+        User student = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Enrollment enrollment = enrollmentRepository
+                .findByIdAndStudent(enrollmentId, student)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Enrollment not found"
+                ));
+
+        enrollmentRepository.delete(enrollment);
     }
 }

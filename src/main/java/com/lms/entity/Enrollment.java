@@ -22,6 +22,10 @@ public class Enrollment {
     @Column(nullable = false)
     private LocalDateTime enrolledAt;
 
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+//    private EnrollmentStatus status;
+
     public Enrollment() {
     }
 
@@ -29,6 +33,7 @@ public class Enrollment {
         this.student = student;
         this.course = course;
         this.enrolledAt = LocalDateTime.now();
+        //this.status = EnrollmentStatus.ACTIVE;
     }
 
     public Long getId() {
@@ -58,4 +63,13 @@ public class Enrollment {
     public void setEnrolledAt(LocalDateTime enrolledAt) {
         this.enrolledAt = enrolledAt;
     }
+
+//    public EnrollmentStatus getStatus() {
+//        return status;
+//    }
+//
+//    public void setStatus(EnrollmentStatus status) {
+//        this.status = status;
+//    }
+
 }

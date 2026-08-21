@@ -1,6 +1,7 @@
 package com.lms.config;
 
 import com.lms.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -36,6 +37,12 @@ public class SecurityConfig {
                                 "/api/auth/login"
                         ).permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            System.out.println("ACCESS DENIED: " + accessDeniedException.getMessage());
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        })
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,

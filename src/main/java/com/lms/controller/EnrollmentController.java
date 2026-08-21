@@ -20,6 +20,14 @@ public class EnrollmentController {
         this.enrollmentService = enrollmentService;
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Enrollment>> getAllEnrollments() {
+        return ResponseEntity.ok(
+                enrollmentService.getAllEnrollments()
+        );
+    }
+
     @PostMapping("/{courseId}")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Enrollment> enroll(
@@ -44,5 +52,19 @@ public class EnrollmentController {
         return ResponseEntity.ok(
                 enrollmentService.getMyEnrollments(authentication.getName())
         );
+    }
+
+    @DeleteMapping("/{enrollmentId}")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<Void> cancelEnrollment(
+            @PathVariable Long enrollmentId,
+            Authentication authentication) {
+
+        enrollmentService.cancelEnrollment(
+                enrollmentId,
+                authentication.getName()
+        );
+
+        return ResponseEntity.noContent().build();
     }
 }
