@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import com.lms.dto.EnrollmentResponseDTO;
 
 import java.util.List;
 
@@ -22,15 +23,19 @@ public class EnrollmentController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Enrollment>> getAllEnrollments() {
+    public ResponseEntity<List<EnrollmentResponseDTO>> getAllEnrollments() {
+
         return ResponseEntity.ok(
                 enrollmentService.getAllEnrollments()
+                        .stream()
+                        .map(EnrollmentResponseDTO::new)
+                        .toList()
         );
     }
 
     @PostMapping("/{courseId}")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<Enrollment> enroll(
+    public ResponseEntity<EnrollmentResponseDTO> enroll(
             @PathVariable Long courseId,
             Authentication authentication) {
 
@@ -41,24 +46,25 @@ public class EnrollmentController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(enrollment);
+                .body(new EnrollmentResponseDTO(enrollment));
     }
 
     @GetMapping("/my")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<List<Enrollment>> getMyEnrollments(
+    public ResponseEntity<List<EnrollmentResponseDTO>> getMyEnrollments(
             Authentication authentication) {
 
         return ResponseEntity.ok(
                 enrollmentService.getMyEnrollments(authentication.getName())
+                        .stream()
+                        .map(EnrollmentResponseDTO::new)
+                        .toList()
         );
     }
 
     @DeleteMapping("/{enrollmentId}")
     @PreAuthorize("hasRole('STUDENT')")
-    public ResponseEntity<Void> cancelEnrollment(
-            @PathVariable Long enrollmentId,
-            Authentication authentication) {
+    public ResponseEntity<Void> cancelEnrollment(@PathVariable Long enrollmentId, Authentication authentication) {
 
         enrollmentService.cancelEnrollment(
                 enrollmentId,
