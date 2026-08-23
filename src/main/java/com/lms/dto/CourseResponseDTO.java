@@ -10,12 +10,16 @@ public class CourseResponseDTO {
     private String title;
     private String description;
     private LocalDateTime createdAt;
+    private Long instructorId;
+    private String instructorName;
 
     public CourseResponseDTO(Course course) {
         this.id = course.getId();
         this.title = course.getTitle();
         this.description = course.getDescription();
         this.createdAt = course.getCreatedAt();
+        this.instructorId = course.getInstructor().getId();
+        this.instructorName = course.getInstructor().getName();
     }
 
     public Long getId() {
@@ -32,5 +36,13 @@ public class CourseResponseDTO {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Long getInstructorId() {
+        return instructorId;
+    }
+
+    public String getInstructorName() {
+        return instructorName;
     }
 }

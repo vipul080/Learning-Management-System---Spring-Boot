@@ -1,10 +1,12 @@
 package com.lms.service;
 
+import com.lms.dto.StudentResponseDTO;
 import com.lms.entity.Course;
 import com.lms.entity.Enrollment;
 import com.lms.entity.EnrollmentStatus;
 import com.lms.entity.User;
 import com.lms.exception.AlreadyEnrolledException;
+import com.lms.exception.ForbiddenException;
 import com.lms.exception.ResourceNotFoundException;
 import com.lms.repository.CourseRepository;
 import com.lms.repository.EnrollmentRepository;
@@ -34,10 +36,10 @@ public class EnrollmentService {
     public Enrollment enrollStudent(String email, Long courseId) {
 
         User student = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         if (enrollmentRepository.existsByStudentAndCourse(student, course)) {
             throw new AlreadyEnrolledException(
@@ -61,7 +63,7 @@ public class EnrollmentService {
     public List<Enrollment> getMyEnrollments(String email) {
 
         User student = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return enrollmentRepository.findByStudent(student);
     }
@@ -78,5 +80,38 @@ public class EnrollmentService {
                 ));
 
         enrollmentRepository.delete(enrollment);
+    }
+
+    public List<StudentResponseDTO> getStudentsForCourse(
+            Long courseId,
+            String email
+    ) {
+
+        User teacher = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found")
+                );
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Course not found")
+                );
+
+
+        if (teacher.getRole().name().equals("TEACHER")
+                && !course.getInstructor().getId().equals(teacher.getId())) {
+
+            throw new ForbiddenException(
+                    "You cannot view students of another teacher's course"
+            );
+        }
+
+
+        return enrollmentRepository.findByCourse(course)
+                .stream()
+                .map(enrollment ->
+                        new StudentResponseDTO(enrollment.getStudent())
+                )
+                .toList();
     }
 }

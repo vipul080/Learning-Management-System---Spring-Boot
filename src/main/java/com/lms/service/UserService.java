@@ -3,6 +3,7 @@ package com.lms.service;
 import com.lms.dto.UserResponseDTO;
 import com.lms.entity.Role;
 import com.lms.entity.User;
+import com.lms.exception.BadRequestException;
 import com.lms.exception.ResourceNotFoundException;
 import com.lms.repository.UserRepository;
 import com.lms.security.JwtService;
@@ -29,7 +30,9 @@ public class UserService {
     public User registerUser(User user) {
 
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new BadRequestException(
+                    "Email already registered"
+            );
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -40,10 +43,16 @@ public class UserService {
     public String login(String email, String password) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() ->
+                        new BadRequestException(
+                                "Invalid email or password"
+                        )
+                );
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new BadRequestException(
+                    "Invalid email or password"
+            );
         }
 
         return jwtService.generateToken(user.getEmail(), user.getRole().name());    }
