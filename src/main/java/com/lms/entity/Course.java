@@ -3,6 +3,7 @@ package com.lms.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -24,7 +25,8 @@ public class Course {
     @Column(nullable = false, length = 1000)
     private String description;
 
-    @Column(nullable = false)
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -37,7 +39,6 @@ public class Course {
     public Course(String title, String description) {
         this.title = title;
         this.description = description;
-        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {

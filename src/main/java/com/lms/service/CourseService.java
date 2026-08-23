@@ -8,6 +8,8 @@ import com.lms.exception.ForbiddenException;
 import com.lms.repository.UserRepository;
 import com.lms.exception.ResourceNotFoundException;
 import com.lms.repository.CourseRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,12 +42,12 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public List<CourseResponseDTO> getAllCourses() {
+    public Page<CourseResponseDTO> getAllCourses(
+            Pageable pageable
+    ) {
 
-        return courseRepository.findAll()
-                .stream()
-                .map(CourseResponseDTO::new)
-                .toList();
+        return courseRepository.findAll(pageable)
+                .map(CourseResponseDTO::new);
     }
 
     public CourseResponseDTO getCourseById(Long id) {

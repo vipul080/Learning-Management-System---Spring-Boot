@@ -7,6 +7,8 @@ import com.lms.entity.Course;
 import com.lms.service.CourseService;
 import com.lms.service.EnrollmentService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,8 +46,10 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseResponseDTO>> getAllCourses() {
-        return ResponseEntity.ok(courseService.getAllCourses());
+    public ResponseEntity<Page<CourseResponseDTO>> getAllCourses(
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(courseService.getAllCourses(pageable));
     }
 
     @GetMapping("/{id}")
