@@ -1,0 +1,28 @@
+volumes:
+  postgres_data:
+
+services:
+
+  postgres:
+    image: postgres:18
+    container_name: lms-postgres
+    environment:
+      POSTGRES_DB: lms
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  app:
+    build: .
+    container_name: lms-app
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/lms
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
